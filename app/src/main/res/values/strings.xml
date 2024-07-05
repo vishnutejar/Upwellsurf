@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">Upwellsurf</string>
+    <string name="contact_agent">Contact Agent</string>
+    <string name="weather">Weather</string>
+    <string name="wind">Wind</string>
+    <string name="water">Water</string>
+    <string name="bouy">Bouy</string>
+    <string name="search">Search</string>
+    <string name="live_report">Live Report</string>
+    <string name="upload_a_picture">Upload a Picture</string>
+    <string name="send_private_message">Send Private Message</string>
+    <string name="send">Send</string>
+    <string name="enter_your_message">Enter your message</string>
+    <string name="camera">Camera</string>
+    <string name="gallery">Gallery</string>
+    <string name="private_message">Private Message</string>
+    <string name="save_picture">Save Picture</string>
+</resources>
