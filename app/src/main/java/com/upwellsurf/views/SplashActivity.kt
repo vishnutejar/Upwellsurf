@@ -18,7 +18,7 @@ class SplashActivity : AppCompatActivity() {
             startActivity(
                 Intent(
                     this,
-                    DashboardActivity::class.java
+                    LoginActivity::class.java
                 ).apply { Intent.FLAG_ACTIVITY_SINGLE_TOP })
             finish()
         }, 2000)

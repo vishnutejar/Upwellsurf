@@ -1,9 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
+
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+
     <uses-feature android:name="android.hardware.camera" />
+
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -14,6 +19,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Upwellsurf"
         tools:targetApi="31">
+        <activity
+            android:name=".views.SevenForcastActivity"
+            android:exported="false" />
+        <activity
+            android:name=".views.LoginActivity"
+            android:exported="false" />
         <activity
             android:name=".views.LiveReportActivity"
             android:exported="false" />
@@ -32,9 +43,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <provider
             android:name="androidx.core.content.FileProvider"
-            android:authorities="com.upwellsurf.fileprovider"
+            android:authorities="com.upwellsurf"
             android:exported="false"
             android:grantUriPermissions="true">
             <meta-data

@@ -9,4 +9,8 @@
     <color name="white">#FFFFFFFF</color>
     <color name="blue_500">#005BFF</color>
     <color name="gray_100">#F5F5F5</color>
+
+    <color name="themeColor1">#946c82</color>
+    <color name="themeColor2">#758b8b</color>
+    <color name="yellow_500">#FDD835</color>
 </resources>

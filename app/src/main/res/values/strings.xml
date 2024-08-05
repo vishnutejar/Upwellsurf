@@ -7,6 +7,7 @@
     <string name="bouy">Bouy</string>
     <string name="search">Search</string>
     <string name="live_report">Live Report</string>
+    <string name="sevendaysforecast">7 Days Forecast</string>
     <string name="upload_a_picture">Upload a Picture</string>
     <string name="send_private_message">Send Private Message</string>
     <string name="send">Send</string>
@@ -15,4 +16,13 @@
     <string name="gallery">Gallery</string>
     <string name="private_message">Private Message</string>
     <string name="save_picture">Save Picture</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="backbutton">backbutton</string>
+    <string name="email">Email</string>
+    <string name="contact_gmail_com">contact@gmail.com</string>
+    <string name="password">Password</string>
+    <string name="forgotten_password">Forgotten Password?</string>
+    <string name="log_in">Log in</string>
+    <string name="create_new_account">Create new account</string>
 </resources>

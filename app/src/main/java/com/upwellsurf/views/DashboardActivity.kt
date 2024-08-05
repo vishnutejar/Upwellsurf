@@ -26,6 +26,7 @@ class DashboardActivity : AppCompatActivity(), IOnItemSelectedSports {
     lateinit var clearSearchValue: ImageView
     lateinit var etSearchView: EditText
     lateinit var txt_live_report: TextView
+    lateinit var txt_seven_forcast: TextView
     lateinit var listOfSpots: MutableList<SurfSpot>
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,6 +35,7 @@ class DashboardActivity : AppCompatActivity(), IOnItemSelectedSports {
         clearSearchValue = findViewById(R.id.im_clearbt)
         reCySpots = findViewById(R.id.recyclerview)
         etSearchView = findViewById(R.id.et_search)
+        txt_seven_forcast = findViewById(R.id.txt_seven_forcast)
         txt_live_report = findViewById(R.id.txt_live_report)
         listOfSpots = ContentView().surfSpots
         adapter_custome = SurfSpotsAdapter(listOfSpots, this)
@@ -69,6 +71,11 @@ class DashboardActivity : AppCompatActivity(), IOnItemSelectedSports {
 
             }
         })
+
+        txt_seven_forcast.setOnClickListener {
+            var gotoSevenForcastActivity=Intent(this,SevenForcastActivity::class.java)
+            startActivity(gotoSevenForcastActivity)
+        }
     }
 
     override fun onItemSelected(position: Int) {

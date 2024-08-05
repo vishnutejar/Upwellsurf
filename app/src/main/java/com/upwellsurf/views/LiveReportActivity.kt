@@ -4,14 +4,14 @@ import android.Manifest
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.content.res.AssetFileDescriptor
+import android.media.MediaPlayer
 import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
-import android.provider.MediaStore
 import android.view.LayoutInflater
 import android.view.MenuItem
-import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
@@ -26,10 +26,13 @@ import com.google.android.material.snackbar.Snackbar
 import com.upwellsurf.R
 import com.upwellsurf.adapters.ChatAdapter
 import com.upwellsurf.models.ChatMessages
+import com.upwellsurf.views.frgs.PrivateMsgDialogFrg
 import java.io.File
+import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+
 
 class LiveReportActivity : AppCompatActivity() {
     lateinit var txt_upload_picture: TextView
@@ -41,11 +44,23 @@ class LiveReportActivity : AppCompatActivity() {
     var listOfMessages = ArrayList<ChatMessages>()
     lateinit var bt_send: AppCompatButton
     lateinit var et_message: EditText
-
+    lateinit var photoURI: Uri
     val galleryLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) {
         val galleryUri = it
         try {
-            img_capture_pic.setImageURI(galleryUri)
+            if (galleryUri != null) {
+                img_capture_pic.setImageURI(galleryUri)
+                startSound("photo_upload.mp3")
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+
+    }
+    val cameraLauncher = registerForActivityResult(ActivityResultContracts.TakePicture()) {
+        try {
+            img_capture_pic.setImageURI(photoURI)
+            startSound("photo_upload.mp3")
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -55,6 +70,15 @@ class LiveReportActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_live_report)
+        val dialogFragment = PrivateMsgDialogFrg()
+        dialogFragment.show(supportFragmentManager, "PrivateMsgDialogFrg")
+
+        photoURI = FileProvider.getUriForFile(
+            this,
+            this.applicationContext.packageName,
+            createImageFile()
+        )
+
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.title = getString(R.string.live_report)
         txt_upload_picture = findViewById(R.id.txt_upload_picture)
@@ -85,8 +109,10 @@ class LiveReportActivity : AppCompatActivity() {
                 listOfMessages.add(ChatMessages(msg))
                 et_message.text.clear()
                 val adapter = ChatAdapter(listOfMessages)
-                val recy_chat_list = findViewById<androidx.recyclerview.widget.RecyclerView>(R.id.recy_chat_list)
-                recy_chat_list.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(this)
+                val recy_chat_list =
+                    findViewById<androidx.recyclerview.widget.RecyclerView>(R.id.recy_chat_list)
+                recy_chat_list.layoutManager =
+                    androidx.recyclerview.widget.LinearLayoutManager(this)
                 recy_chat_list.adapter = adapter
             } else {
                 Snackbar.make(this.bt_send, "Please enter a message", Snackbar.LENGTH_SHORT).show()
@@ -111,11 +137,13 @@ class LiveReportActivity : AppCompatActivity() {
         ) {
             ActivityCompat.requestPermissions(
                 this,
-                arrayOf(Manifest.permission.CAMERA),
+                arrayOf(Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE),
                 REQUEST_CAMERA_PERMISSION
             )
-        }
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        } else if (ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
+            )
             != PackageManager.PERMISSION_GRANTED
         ) {
             ActivityCompat.requestPermissions(
@@ -145,24 +173,13 @@ class LiveReportActivity : AppCompatActivity() {
     private fun createImageFile(): File {
         val timeStamp: String =
             SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
-        val storageDir: File? = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
-        return File.createTempFile("JPEG_${timeStamp}_", ".jpg", storageDir).apply {
+        val storageDir: File? =
+            this.applicationContext.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+        return File.createTempFile("JPEG_${timeStamp}_", ".jpg", externalMediaDirs.first()).apply {
             photoFile = this
         }
     }
 
-    private fun dispatchTakePictureIntent() {
-        Intent(MediaStore.ACTION_IMAGE_CAPTURE).also { takePictureIntent ->
-            takePictureIntent.resolveActivity(packageManager)?.also {
-                val photoURI: Uri = FileProvider.getUriForFile(
-                    this,
-                    "com.com.upwellsurf.fileprovider", createImageFile()
-                )
-                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI)
-                startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE)
-            }
-        }
-    }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
@@ -188,15 +205,15 @@ class LiveReportActivity : AppCompatActivity() {
         val gallery = dialogLayout.findViewById<TextView>(R.id.txt_gallery)
         // Create an AlertDialog builder
         val builder = AlertDialog.Builder(context)
-            .setTitle("Video Player Dialog")
+            .setTitle("Select Your option to upload a picture")
             .setView(dialogLayout)
             .setPositiveButton("Close") { dialog, _ -> dialog.dismiss() }
         // Create and show the dialog
         val dialog = builder.create()
 
         camera.setOnClickListener {
-            dispatchTakePictureIntent()
             dialog.dismiss()
+            cameraLauncher.launch(photoURI)
         }
         gallery.setOnClickListener {
             galleryLauncher.launch("image/*")
@@ -206,5 +223,26 @@ class LiveReportActivity : AppCompatActivity() {
         dialog.show()
     }
 
+    private fun startSound(filename: String) {
+        val player = MediaPlayer()
+        var afd: AssetFileDescriptor? = null
+        try {
+            afd = resources.assets.openFd(filename)
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
+        try {
+            checkNotNull(afd)
+            player.setDataSource(afd.fileDescriptor, afd.startOffset, afd.length)
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
+        try {
+            player.prepare()
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
+        player.start()
+    }
 
 }
